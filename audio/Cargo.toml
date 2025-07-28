@@ -1,0 +1,11 @@
+[package]
+name = "oms_audio"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+anyhow = { workspace = true }
+ffmpeg = { version = "0.17.0", package = "rsmpeg", features = [
+	"link_vcpkg_ffmpeg",
+	"ffmpeg7",
+] }

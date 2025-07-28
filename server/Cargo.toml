@@ -1,0 +1,13 @@
+[package]
+name = "oms"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+oms_types = { path = "../types" }
+oms_api = { path = "../api" }
+axum = { workspace = true }
+tokio = { workspace = true }
+serde = { workspace = true }
+anyhow = { workspace = true }
+serde_ini = "0.2.0"
