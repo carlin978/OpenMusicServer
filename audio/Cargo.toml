@@ -7,5 +7,5 @@ edition = "2024"
 anyhow = { workspace = true }
 ffmpeg = { version = "0.17.0", package = "rsmpeg", features = [
 	"link_vcpkg_ffmpeg",
-	"ffmpeg7",
+	"ffmpeg7_1",
 ] }
