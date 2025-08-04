@@ -5,7 +5,18 @@ edition = "2024"
 
 [dependencies]
 anyhow = { workspace = true }
-ffmpeg = { version = "0.17.0", package = "rsmpeg", features = [
+ffmpeg = { version = "0.17.0", package = "rsmpeg", default-features = false, features = [
 	"link_vcpkg_ffmpeg",
 	"ffmpeg7_1",
 ] }
+
+[package.metadata.vcpkg]
+git = "https://github.com/microsoft/vcpkg"
+# Change the triplet according to your build target
+dependencies = ["ffmpeg"]
+# Use vcpkg's master branch
+branch = "master"
+
+[package.metadata.vcpkg.target]
+x86_64-pc-windows-msvc = { triplet = "x64-windows-static-md" }
+x86_64-unknown-linux-gnu = { triplet = "x64-linux" }

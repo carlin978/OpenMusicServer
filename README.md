@@ -13,7 +13,7 @@ Dependencies:
 Install ffmpeg libs for linking
 
 ```
-vcpkg install ffmpeg[opus]:x64-linux
+cargo vcpkg build
 ```
 
 Then build
@@ -32,7 +32,7 @@ Dependencies:
 Install ffmpeg libs for linking
 
 ```
-vcpkg install ffmpeg[opus]:x64-windows-static-md
+cargo vcpkg build
 ```
 
 Then build
