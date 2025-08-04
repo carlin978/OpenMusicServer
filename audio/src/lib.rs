@@ -43,11 +43,7 @@ fn open_output_file(
 ) -> Result<(AVFormatContextOutput, AVCodecContext)> {
     // Create a new format context for the output container format.
     let mut output_format_context =
-        AVFormatContextOutput::create(output_file).context("Failed to open output file.")?;
-
-    // Find the Opus encoder to be used by its ID.
-    // let encode_codec =
-    //     AVCodec::find_encoder(ffi::AV_CODEC_ID_OPUS).context("Failed to find opus encoder")?;
+        AVFormatContextOutput::create(output_file).context("Failed to open output file")?;
 
     // Find the Opus encoder to be used by its short name.
     let encode_codec =
@@ -175,7 +171,7 @@ fn load_encode_and_write(
     Ok(())
 }
 
-fn transcode_aac_to_opus(input_file: &CStr, output_file: &CStr) -> Result<()> {
+pub fn transcode_to_opus(input_file: &CStr, output_file: &CStr) -> Result<()> {
     // Open the input file for reading.
     let (mut input_format_context, mut decode_context, audio_stream_index) =
         open_input_file(input_file)?;
@@ -282,24 +278,51 @@ fn transcode_aac_to_opus(input_file: &CStr, output_file: &CStr) -> Result<()> {
     Ok(())
 }
 
-#[test]
-fn transcode_aac_to_opus_test() {
-    std::fs::create_dir_all("tests/output/transcode_opus/").unwrap();
-    // Assuming 'sample1_short.aac' is a valid input file.
-    transcode_aac_to_opus(
-        c"tests/assets/audios/sample1_short.aac",
-        c"tests/output/transcode_opus/output.opus",
-    )
-    .unwrap();
-}
+#[cfg(test)]
+mod test {
+    use super::*;
 
-/* #[test]
-fn transcode_mp4_to_opus_test() {
-    std::fs::create_dir_all("tests/output/transcode_opus/").unwrap();
-    // Assuming 'big_buck_bunny.mp4' has an AAC audio stream.
-    transcode_aac_to_opus(
-        c"tests/assets/vids/big_buck_bunny.mp4",
-        c"tests/output/transcode_opus/big_buck_bunny.opus",
-    )
-    .unwrap();
-} */
+    #[test]
+    fn transcode_stereo_aac_to_opus_test() {
+        std::fs::create_dir_all("tests/output/transcode_opus/").unwrap();
+
+        transcode_to_opus(
+            c"tests/assets/audios/sample1_stereo.aac",
+            c"tests/output/transcode_opus/output1_stereo.opus",
+        )
+        .unwrap();
+    }
+
+    #[test]
+    fn transcode_stereo_mp3_to_opus_test() {
+        std::fs::create_dir_all("tests/output/transcode_opus/").unwrap();
+
+        transcode_to_opus(
+            c"tests/assets/audios/sample2_stereo.mp3",
+            c"tests/output/transcode_opus/output2_stereo.opus",
+        )
+        .unwrap();
+    }
+
+    #[test]
+    fn transcode_mono_aac_to_opus_test() {
+        std::fs::create_dir_all("tests/output/transcode_opus/").unwrap();
+
+        transcode_to_opus(
+            c"tests/assets/audios/sample1_mono.aac",
+            c"tests/output/transcode_opus/output1_mono.opus",
+        )
+        .unwrap();
+    }
+
+    #[test]
+    fn transcode_mono_mp3_to_opus_test() {
+        std::fs::create_dir_all("tests/output/transcode_opus/").unwrap();
+
+        transcode_to_opus(
+            c"tests/assets/audios/sample2_mono.mp3",
+            c"tests/output/transcode_opus/output2_mono.opus",
+        )
+        .unwrap();
+    }
+}
