@@ -5,3 +5,5 @@ edition = "2024"
 
 [dependencies]
 serde = { workspace = true }
+anyhow = { workspace = true }
+crossbeam-deque = "0.8.6"
