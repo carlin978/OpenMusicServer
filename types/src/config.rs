@@ -1,9 +1,9 @@
+use super::Config;
 use anyhow::{Context, bail};
-use oms_types::Config;
 use std::{env, path::PathBuf};
 
 pub fn load_config() -> anyhow::Result<Config> {
-	use config;
+	use ::config;
 
 	let path = if cfg!(debug_assertions) {
 		env::current_dir()?
@@ -24,8 +24,7 @@ pub fn load_config() -> anyhow::Result<Config> {
 	Ok(config::Config::builder()
 		.add_source(
 			config::File::new(
-				path.to_str()
-					.context("Non-Unicode paths aren't supported")?,
+				path.to_str().context("Non-Unicode paths aren't supported")?,
 				config::FileFormat::Ini,
 			)
 			.required(false),
@@ -43,9 +42,7 @@ pub fn get_app_data_dir() -> anyhow::Result<PathBuf> {
 	} else {
 		match env::var("XDG_DATA_HOME") {
 			Ok(content) => PathBuf::from(content),
-			Err(env::VarError::NotPresent) => PathBuf::from(env::var("HOME")?)
-				.join(".local")
-				.join("share"),
+			Err(env::VarError::NotPresent) => PathBuf::from(env::var("HOME")?).join(".local").join("share"),
 			Err(err) => bail!(err),
 		}
 	};

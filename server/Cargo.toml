@@ -1,5 +1,5 @@
 [package]
-name = "oms"
+name = "oms_server"
 version = "0.1.0"
 edition = "2024"
 
@@ -11,8 +11,3 @@ tokio = { workspace = true }
 serde = { workspace = true }
 anyhow = { workspace = true }
 sqlx = { workspace = true }
-serde_ini = "0.2.0"
-config = { version = "0.15.14", features = [
-	"convert-case",
-	"ini",
-], default-features = false }

@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["api", "audio", "server", "types"]
+members = ["api", "audio", "cli", "server", "types"]
 
 [workspace.dependencies]
 anyhow = "1.0.98"

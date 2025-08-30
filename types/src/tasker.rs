@@ -1,6 +1,5 @@
 use crossbeam_deque::{Steal, Worker};
 use std::{
-	any::Any,
 	collections::HashMap,
 	panic::{UnwindSafe, catch_unwind},
 	sync::{LazyLock, Mutex, mpsc},
@@ -14,8 +13,7 @@ struct Task {
 	pub closure: TaskClosure,
 }
 impl Task {
-	const ID_ITER: LazyLock<Mutex<std::ops::RangeFrom<u32>>> =
-		LazyLock::new(|| Mutex::new((0..).into_iter()));
+	const ID_ITER: LazyLock<Mutex<std::ops::RangeFrom<u32>>> = LazyLock::new(|| Mutex::new((0..).into_iter()));
 
 	fn new(closure: TaskClosure) -> Self {
 		Self {
@@ -107,10 +105,7 @@ impl ThreadedTaskRunner {
 			}
 		}
 
-		self.task_status
-			.get(&id)
-			.cloned()
-			.unwrap_or(TaskStatus::NotFound)
+		self.task_status.get(&id).cloned().unwrap_or(TaskStatus::NotFound)
 	}
 
 	pub fn join(self) -> thread::Result<()> {

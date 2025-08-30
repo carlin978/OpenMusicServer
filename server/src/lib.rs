@@ -1,18 +1,10 @@
-use std::sync::{Arc, Mutex};
-
 use anyhow::Context;
 use axum::{Router, routing::get};
-use oms_types::{AppState, tasker::ThreadedTaskRunner};
+use oms_types::{AppState, Config, config};
 use sqlx::sqlite::SqlitePoolOptions;
 
-mod config;
-
 #[tokio::main]
-async fn main() -> anyhow::Result<()> {
-	let config = config::load_config()
-		.context("Failed to load config")
-		.unwrap();
-
+pub async fn init(config: Config) -> anyhow::Result<()> {
 	let db = {
 		let db_url = if config.in_memory_database {
 			"sqlite::memory:".to_string()
@@ -23,8 +15,7 @@ async fn main() -> anyhow::Result<()> {
 
 			format!(
 				"sqlite:{}",
-				path.to_str()
-					.context("Non-unicode paths aren't supported")?
+				path.to_str().context("Non-unicode paths aren't supported")?
 			)
 		};
 
@@ -34,14 +25,11 @@ async fn main() -> anyhow::Result<()> {
 			.context("Failed to connect to SQLite database")?
 	};
 
-	let state = AppState {
-		db,
-		tasker: Arc::new(Mutex::new(ThreadedTaskRunner::new())),
-	};
+	let state = AppState::new(db);
 
 	let app = Router::new()
 		.route("/", get(|| async { "Hello, World!" }))
-		.nest("/api", oms_api::get_api_router())
+		.nest("/api", oms_api::get_router())
 		.with_state(state);
 
 	let listener = tokio::net::TcpListener::bind(format!("0.0.0.0:{}", config.port))

@@ -1,13 +1,14 @@
 [package]
-name = "oms_types"
+name = "oms"
 version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-serde = { workspace = true }
+oms_types = { path = "../types" }
+oms_server = { path = "../server" }
+oms_api = { path = "../api" }
 anyhow = { workspace = true }
-sqlx = { workspace = true }
-crossbeam-deque = "0.8.6"
+clap = { version = "4.5.45", features = ["derive"] }
 config = { version = "0.15.14", features = [
 	"convert-case",
 	"ini",
