@@ -3,6 +3,15 @@ use axum::{Router, routing::get};
 use oms_types::{AppState, Config, config};
 use sqlx::sqlite::SqlitePoolOptions;
 
+macro_rules! serve {
+	($port:expr, $app:expr) => {{
+		let listener = tokio::net::TcpListener::bind(format!("0.0.0.0:{}", $port))
+			.await
+			.unwrap();
+		axum::serve(listener, $app)
+	}};
+}
+
 #[tokio::main]
 pub async fn init(config: Config) -> anyhow::Result<()> {
 	let db = {
@@ -27,15 +36,9 @@ pub async fn init(config: Config) -> anyhow::Result<()> {
 
 	let state = AppState::new(db);
 
-	let app = Router::new()
-		.route("/", get(|| async { "Hello, World!" }))
-		.nest("/api", oms_api::get_router())
-		.with_state(state);
+	let app = Router::new().route("/", get(async || "Hello, World!"));
 
-	let listener = tokio::net::TcpListener::bind(format!("0.0.0.0:{}", config.port))
-		.await
-		.unwrap();
-	axum::serve(listener, app).await.unwrap();
+	let _ = tokio::join!(serve!(config.port, app), serve!(5335, oms_api::get_router(state)));
 
 	Ok(())
 }
