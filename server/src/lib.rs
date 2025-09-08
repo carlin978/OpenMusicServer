@@ -1,7 +1,7 @@
 use anyhow::Context;
 use axum::{Router, routing::get};
 use oms_types::{AppState, Config, config};
-use sqlx::sqlite::SqlitePoolOptions;
+use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
 
 macro_rules! serve {
 	($port:expr, $app:expr) => {{
@@ -12,33 +12,53 @@ macro_rules! serve {
 	}};
 }
 
+macro_rules! spawn_server {
+	($server:expr) => {
+		tokio::task::spawn(async move {
+			$server.await.unwrap();
+		})
+	};
+}
+
 #[tokio::main]
 pub async fn init(config: Config) -> anyhow::Result<()> {
 	let db = {
-		let db_url = if config.in_memory_database {
-			"sqlite::memory:".to_string()
-		} else {
-			let path = config::get_app_data_dir()
-				.context("Failed to get app data directory from environment")?
-				.join("oms.db");
+		let mut connect_options = SqliteConnectOptions::new();
 
-			format!(
-				"sqlite:{}",
-				path.to_str().context("Non-unicode paths aren't supported")?
-			)
+		connect_options = if config.in_memory_database {
+			connect_options.in_memory(true)
+		} else {
+			connect_options
+				.filename({
+					let data_dir =
+						config::get_app_data_dir().context("Failed to get data directory from environment")?;
+
+					#[cfg(not(debug_assertions))]
+					std::fs::create_dir_all(data_dir.clone());
+
+					data_dir.join("oms.db")
+				})
+				.create_if_missing(true)
 		};
 
-		SqlitePoolOptions::new()
-			.connect(&db_url)
+		let pool = SqlitePoolOptions::new()
+			.connect_with(connect_options)
 			.await
-			.context("Failed to connect to SQLite database")?
+			.context("Failed to connect to SQLite database")?;
+
+		sqlx::migrate!("../migrations").run(&pool).await?;
+
+		pool
 	};
 
 	let state = AppState::new(db);
 
 	let app = Router::new().route("/", get(async || "Hello, World!"));
 
-	let _ = tokio::join!(serve!(config.port, app), serve!(5335, oms_api::get_router(state)));
+	let _ = tokio::join!(
+		spawn_server!(serve!(config.port, app)),
+		spawn_server!(serve!(5335, oms_api::get_router(state)))
+	);
 
 	Ok(())
 }
