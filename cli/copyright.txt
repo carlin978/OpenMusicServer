@@ -1,0 +1,2 @@
+Copyright © 2025 carlin978
+Open Music Server is provided under the terms of the GNU Affero General Public License, Version 3

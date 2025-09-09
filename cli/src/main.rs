@@ -12,9 +12,9 @@ fn main() -> anyhow::Result<()> {
 	match cli.command {
 		Commands::Copyright { full_license } => {
 			if full_license {
-				println!("{}", include_str!("../../LICENSE"));
+				println!(include_str!("../../LICENSE"));
 			} else {
-				println!("Copyright © 2025 carlin978");
+				println!(include_str!("../copyright.txt"));
 			}
 		}
 		Commands::Init { daemon } => {

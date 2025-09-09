@@ -34,7 +34,7 @@ pub async fn init(config: Config) -> anyhow::Result<()> {
 						config::get_app_data_dir().context("Failed to get data directory from environment")?;
 
 					#[cfg(not(debug_assertions))]
-					std::fs::create_dir_all(data_dir.clone());
+					std::fs::create_dir_all(data_dir.clone()).ok();
 
 					data_dir.join("oms.db")
 				})
