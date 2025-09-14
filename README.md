@@ -9,6 +9,8 @@
 - vcpkg
 - [cargo-vcpkg](https://github.com/mcgoo/cargo-vcpkg?tab=readme-ov-file#installation)
 - [just](https://github.com/casey/just?tab=readme-ov-file#installation)
+- Node.js
+- pnpm
 
 ### Instructions:
 
@@ -21,5 +23,5 @@ just install-ffmpeg
 Then build
 
 ```
-cargo build
+just build
 ```

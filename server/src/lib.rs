@@ -1,7 +1,12 @@
 use anyhow::Context;
-use axum::{Router, routing::get};
+use axum::Router;
 use oms_types::{AppState, Config, config};
 use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
+use std::env;
+use tower::ServiceBuilder;
+use tower_http::{
+	compression::CompressionLayer, cors::CorsLayer, decompression::DecompressionLayer, services::ServeDir,
+};
 
 macro_rules! serve {
 	($port:expr, $app:expr) => {{
@@ -53,7 +58,34 @@ pub async fn init(config: Config) -> anyhow::Result<()> {
 
 	let state = AppState::new(db);
 
-	let app = Router::new().route("/", get(async || "Hello, World!"));
+	let app = Router::new()
+		.layer(
+			ServiceBuilder::new()
+				.layer(CorsLayer::new())
+				.layer(CompressionLayer::new())
+				.layer(DecompressionLayer::new()),
+		)
+		.fallback_service(ServeDir::new(if cfg!(debug_assertions) {
+			"www/dist".to_string()
+		} else {
+			if cfg!(windows) {
+				env::current_exe()?
+					.parent()
+					.unwrap()
+					.join("www")
+					.to_str()
+					.context("Non-Unicode paths aren't supported")?
+					.to_string()
+			} else {
+				#[cfg(all(not(debug_assertions), not(windows)))]
+				return env!(
+					"OMS_WWW_LOCATION",
+					"OMS_WWW_LOCATION must be set for non-Windows release builds"
+				)
+				.to_string();
+				unreachable!()
+			}
+		}));
 
 	let _ = tokio::join!(
 		spawn_server!(serve!(config.port, app)),
