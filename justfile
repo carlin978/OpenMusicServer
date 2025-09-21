@@ -6,11 +6,13 @@
 	cargo vcpkg build
 
 [working-directory: 'www']
-@_build-www:
-	pnpm run build
+@setup-www:
+	pnpm install
 
-@build: _build-www
+@build:
+	cd www && pnpm run build-dev
 	cargo build
 
-@build-release: _build-www
+@build-release:
+	cd www && pnpm run build
 	cargo build --release

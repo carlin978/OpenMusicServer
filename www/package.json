@@ -4,10 +4,9 @@
 	"version": "0.0.0",
 	"type": "module",
 	"scripts": {
-		"dev": "vite",
 		"build": "vite build",
-		"watch": "vite build --watch",
-		"preview": "vite preview",
+		"build-dev": "vite build --mode development",
+		"dev": "vite build --mode development --watch",
 		"check": "svelte-check --tsconfig ./tsconfig.app.json && tsc -p tsconfig.node.json"
 	},
 	"devDependencies": {

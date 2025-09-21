@@ -16,8 +16,16 @@
 
 Install ffmpeg libs for linking
 
+> This is likely to take a long time
+
 ```
 just install-ffmpeg
+```
+
+Install dependencies for the Web dashboard
+
+```
+just setup-www
 ```
 
 Then build

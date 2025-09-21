@@ -5,9 +5,10 @@ import { resolve } from 'node:path';
 
 const SRC_DIR = resolve(import.meta.dirname, './src');
 
-export default defineConfig({
+export default defineConfig(configEnv => ({
 	build: {
-		modulePreload: { polyfill: false }
+		modulePreload: { polyfill: false },
+		sourcemap: configEnv.mode === 'development'
 	},
 	resolve: {
 		alias: {
@@ -16,4 +17,4 @@ export default defineConfig({
 	},
 	appType: 'spa',
 	plugins: [svelte(), tailwindcss()]
-});
+}));
