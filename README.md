@@ -6,6 +6,7 @@
 
 - Rust
 - Clang
+- nasm
 - vcpkg
 - [cargo-vcpkg](https://github.com/mcgoo/cargo-vcpkg?tab=readme-ov-file#installation)
 - [just](https://github.com/casey/just?tab=readme-ov-file#installation)
